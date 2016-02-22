@@ -68,7 +68,7 @@ func (this *sLogger) Error() Log {
 }
 
 func (this *sLogger) Trace(detail int) Log {
-	if PriorityTrace+Priority(detail) <= this.level {
+	if PriorityTrace+Priority(detail-1) <= this.level {
 		return this.logs[PriorityTrace]
 	} else {
 		return drain
@@ -150,7 +150,7 @@ func (this *sSelector) Error() Log {
 }
 
 func (this *sSelector) Trace(detail int) Log {
-	if PriorityTrace+Priority(detail) <= this.level {
+	if PriorityTrace+Priority(detail-1) <= this.level {
 		return this.logs[PriorityTrace].ScopedLog(this.scope)
 	} else {
 		return drain
