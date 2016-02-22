@@ -68,7 +68,11 @@ func (this *sLogger) Error() Log {
 }
 
 func (this *sLogger) Trace(detail int) Log {
-	return this.logs[PriorityTrace]
+	if PriorityTrace+Priority(detail) <= this.level {
+		return this.logs[PriorityTrace]
+	} else {
+		return drain
+	}
 }
 
 func (this *sLogger) On(err error) Selector {
@@ -111,7 +115,10 @@ func (this *sLog) prints(calldepth int, message string, v []interface{}, err err
 	if err == nil {
 		err = this.scope
 	}
-	s := this.formatter(message, v, err)
+	s := message
+	if this.formatter != nil {
+		s = this.formatter(message, v, err)
+	}
 	return this.logger.Output(calldepth+1, s)
 }
 
@@ -143,7 +150,11 @@ func (this *sSelector) Error() Log {
 }
 
 func (this *sSelector) Trace(detail int) Log {
-	return this.logs[PriorityTrace].ScopedLog(this.scope)
+	if PriorityTrace+Priority(detail) <= this.level {
+		return this.logs[PriorityTrace].ScopedLog(this.scope)
+	} else {
+		return drain
+	}
 }
 
 func (this *sSelector) Prints(message string, v ...interface{}) {
