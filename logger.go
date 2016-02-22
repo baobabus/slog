@@ -9,9 +9,9 @@ import (
 )
 
 var (
-	errSuccess = errors.New("success")
-	errEllipsis = errors.New("...")
-	errNoFacility = errors.New("no facility")
+	errSuccess     = errors.New("success")
+	errEllipsis    = errors.New("...")
+	errNoFacility  = errors.New("no facility")
 	errNoFormatter = errors.New("no formatter")
 )
 
@@ -112,7 +112,7 @@ func (this *sLog) prints(calldepth int, message string, v []interface{}, err err
 		err = this.scope
 	}
 	s := this.formatter(message, v, err)
-	return this.logger.Output(calldepth + 1, s)
+	return this.logger.Output(calldepth+1, s)
 }
 
 var drain = &sLog{formatter: nil, logger: log.New(ioutil.Discard, "", 0), scope: nil}

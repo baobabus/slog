@@ -8,7 +8,7 @@ import (
 )
 
 func (this Priority) SyslogPriority() syslog.Priority {
-	return syslog.Priority(this.Bound() + 3) | syslog.LOG_USER
+	return syslog.Priority(this.Bound()+3) | syslog.LOG_USER
 }
 
 type fSyslog struct {

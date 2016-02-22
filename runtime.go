@@ -8,19 +8,19 @@ import (
 )
 
 var (
-	rtLevel = "info"
-	rtTrace uint = 0
-	rtFormat = "simple"
-	rtLog = "stderr"
-)	
+	rtLevel       = "info"
+	rtTrace  uint = 0
+	rtFormat      = "simple"
+	rtLog         = "stderr"
+)
 
 var newSyslogFacility func(Priority) (Facility, error)
 
 var (
 	sharedFacilityMu = &sync.Mutex{}
-	sharedFacility Facility
-	sharedLoggerMu = &sync.Mutex{}
-	sharedLogger   Logger
+	sharedFacility   Facility
+	sharedLoggerMu   = &sync.Mutex{}
+	sharedLogger     Logger
 )
 
 func SharedLogger() Logger {
@@ -54,7 +54,7 @@ func SharedFacility() Facility {
 
 func DefaultLevel() Priority {
 	if rtTrace > 0 {
-		return Priority(PriorityTrace + Priority(rtTrace - 1))
+		return Priority(PriorityTrace + Priority(rtTrace-1))
 	}
 	switch rtLevel {
 	case "error":

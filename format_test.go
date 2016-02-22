@@ -47,7 +47,7 @@ func TestSimpleFormatter(tst *testing.T) {
 		{"msg", []interface{}{"v", -1}, nil, "msg v=-1"},
 		{"msg", []interface{}{"v", 0.1}, nil, "msg v=0.1"},
 		{"msg", []interface{}{"v", t1}, nil, "msg v=" + t1s},
-		{"msg", []interface{}{"v", 10*time.Second}, nil, "msg v=10s"},
+		{"msg", []interface{}{"v", 10 * time.Second}, nil, "msg v=10s"},
 	} {
 		testFormatter(SimpleFormatter, &t, tst)
 	}
@@ -72,7 +72,7 @@ func TestCompactJsonFormatter(tst *testing.T) {
 		{"msg", []interface{}{"v", -1}, nil, "msg {\"v\":-1}"},
 		{"msg", []interface{}{"v", 0.1}, nil, "msg {\"v\":0.1}"},
 		{"msg", []interface{}{"v", t1}, nil, "msg {\"v\":\"" + t1s + "\"}"},
-		{"msg", []interface{}{"v", 10*time.Second}, nil, "msg {\"v\":10000000000}"},
+		{"msg", []interface{}{"v", 10 * time.Second}, nil, "msg {\"v\":10000000000}"},
 	} {
 		testFormatter(CompactJsonFormatter, &t, tst)
 	}

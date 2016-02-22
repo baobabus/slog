@@ -20,7 +20,7 @@ func SimpleFormatter(message string, v []interface{}, e error) string {
 	}
 	for i := 0; i < len(v); i++ {
 		buf.WriteString(sep)
-		if i & 1 == 0 {
+		if i&1 == 0 {
 			sep = "="
 		} else {
 			sep = " "
@@ -52,7 +52,7 @@ func jsonFormatter(message string, v []interface{}, e error, pretty bool) string
 	m := make(map[string]interface{})
 	for i := 0; i < len(v); i += 2 {
 		k, ok := v[i].(string)
-		if ok && i < (len(v) - 1) {
+		if ok && i < (len(v)-1) {
 			m[k] = v[i+1]
 		}
 	}

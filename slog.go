@@ -43,7 +43,7 @@ type Selector interface {
 type Priority int
 
 const (
-	PriorityError  Priority = iota
+	PriorityError Priority = iota
 	PriorityWarn
 	PriorityNotice
 	PriorityInfo

@@ -8,7 +8,7 @@ import (
 )
 
 type Facility interface {
-	OpenLogs (level Priority) (map[Priority]*log.Logger, error)
+	OpenLogs(level Priority) (map[Priority]*log.Logger, error)
 }
 
 type fFile struct {
@@ -27,7 +27,7 @@ func NewFileFacility(path string) (Facility, error) {
 func (this *fFile) OpenLogs(level Priority) (map[Priority]*log.Logger, error) {
 	var err error
 	if this.file == nil && len(this.path) > 0 {
-		this.file, err = os.OpenFile(this.path, os.O_RDWR | os.O_CREATE | os.O_APPEND, 0640)
+		this.file, err = os.OpenFile(this.path, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0640)
 		if err != nil {
 			return nil, err
 		}
