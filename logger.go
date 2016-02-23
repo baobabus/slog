@@ -167,7 +167,7 @@ func (this *sSelector) Logger() *log.Logger {
 
 func (this *sSelector) scopedLog() Log {
 	if this.scope == nil || this.scope == errSuccess || this.scope == errEllipsis {
-		return this.logs[PriorityInfo].ScopedLog(this.scope)
+		return this.logs[PriorityNotice].ScopedLog(this.scope)
 	} else {
 		return this.logs[PriorityError].ScopedLog(this.scope)
 	}
