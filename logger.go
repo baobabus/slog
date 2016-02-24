@@ -4,6 +4,7 @@ package slog
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 )
@@ -119,7 +120,23 @@ func (this *sLog) prints(calldepth int, message string, v []interface{}, err err
 	if this.formatter != nil {
 		s = this.formatter(message, v, err)
 	}
-	return this.logger.Output(calldepth+1, s)
+	return this.Logger().Output(calldepth+1, s)
+}
+
+func (this *sLog) Output(calldepth int, s string) error {
+	return this.Logger().Output(calldepth+1, s)
+}
+
+func (this *sLog) Printf(format string, v ...interface{}) {
+	this.Logger().Output(2, fmt.Sprintf(format, v...))
+}
+
+func (this *sLog) Print(v ...interface{}) {
+	this.Logger().Output(2, fmt.Sprint(v...))
+}
+
+func (this *sLog) Println(v ...interface{}) {
+	this.Logger().Output(2, fmt.Sprintln(v...))
 }
 
 var drain = &sLog{formatter: nil, logger: log.New(ioutil.Discard, "", 0), scope: nil}

@@ -29,6 +29,11 @@ type Log interface {
 	Logger() *log.Logger
 	ScopedLog(err error) Log
 	prints(calldepth int, message string, v []interface{}, err error) error
+	// Shortcuts to log.Logger
+	Output(calldepth int, s string) error
+	Printf(format string, v ...interface{})
+	Print(v ...interface{})
+	Println(v ...interface{})
 }
 
 type Selector interface {
