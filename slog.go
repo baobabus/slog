@@ -26,6 +26,7 @@ type Logger interface {
 type Log interface {
 	Printe(message string, v ...interface{})
 	Prints(message string, v ...interface{})
+	Fatals(message string, v ...interface{})
 	Logger() *log.Logger
 	ScopedLog(err error) Log
 	prints(calldepth int, message string, v []interface{}, err error) error
@@ -39,6 +40,7 @@ type Log interface {
 type Selector interface {
 	Accessor
 	Prints(message string, v ...interface{})
+	Fatals(message string, v ...interface{})
 	Logger() *log.Logger
 }
 

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 )
 
 var (
@@ -101,6 +102,11 @@ func (this *sLog) Prints(message string, v ...interface{}) {
 	this.prints(2, message, v, this.scope)
 }
 
+func (this *sLog) Fatals(message string, v ...interface{}) {
+	this.prints(2, message, v, this.scope)
+	os.Exit(1)
+}
+
 func (this *sLog) Logger() *log.Logger {
 	return this.logger
 }
@@ -178,12 +184,23 @@ func (this *sSelector) Prints(message string, v ...interface{}) {
 	this.scopedLog().prints(2, message, v, nil)
 }
 
+func (this *sSelector) Fatals(message string, v ...interface{}) {
+	this.scopedLog().prints(2, message, v, nil)
+	if !this.isSuccess() {
+		os.Exit(1)
+	}
+}
+
 func (this *sSelector) Logger() *log.Logger {
 	return this.scopedLog().Logger()
 }
 
+func (this *sSelector) isSuccess() bool {
+	return this.scope == nil || this.scope == errSuccess || this.scope == errEllipsis
+}
+
 func (this *sSelector) scopedLog() Log {
-	if this.scope == nil || this.scope == errSuccess || this.scope == errEllipsis {
+	if this.isSuccess() {
 		return this.logs[PriorityNotice].ScopedLog(this.scope)
 	} else {
 		return this.logs[PriorityError].ScopedLog(this.scope)
