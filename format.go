@@ -63,7 +63,16 @@ func jsonFormatter(message string, v []interface{}, e []error, pretty bool) stri
 		}
 	}
 	if e != nil && len(e) > 0 {
-		m["errors"] = e
+		switch {
+		case len(e) == 1 && (e[0] == nil || e[0] == errSuccess):
+			m["success"] = true
+		default:
+			es := make([]string, 0, len(e))
+			for _, v := range e {
+				es = append(es, v.Error())
+			}
+			m["errors"] = es
+		}
 	}
 	var b []byte
 	var err error
