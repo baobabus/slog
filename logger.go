@@ -77,17 +77,17 @@ func (this *sLogger) Trace(detail int) Log {
 	}
 }
 
-func (this *sLogger) On(err error) Selector {
+func (this *sLogger) On(err ...error) Selector {
 	return &sSelector{this, err}
 }
 
 func (this *sLogger) Success() Selector {
-	return &sSelector{this, errSuccess}
+	return &sSelector{this, []error{errSuccess}}
 }
 
-func (this *sLogger) With(err error) Selector {
-	if err == nil {
-		err = errSuccess
+func (this *sLogger) With(err ...error) Selector {
+	if err == nil || len(err) == 0 || (len(err) == 1 && err[0] == nil) {
+		err = []error{errSuccess}
 	}
 	return &sSelector{this, err}
 }
@@ -95,11 +95,11 @@ func (this *sLogger) With(err error) Selector {
 type sLog struct {
 	formatter Formatter
 	logger    *log.Logger
-	scope     error
+	scope     []error
 }
 
 func (this *sLog) Printe(message string, v ...interface{}) {
-	this.prints(2, message, v, errEllipsis)
+	this.prints(2, message, v, []error{errEllipsis})
 }
 
 func (this *sLog) Prints(message string, v ...interface{}) {
@@ -115,14 +115,14 @@ func (this *sLog) Logger() *log.Logger {
 	return this.logger
 }
 
-func (this *sLog) ScopedLog(err error) Log {
-	if err == nil {
+func (this *sLog) ScopedLog(err ...error) Log {
+	if err == nil || len(err) == 0 || (len(err) == 1 && err[0] == nil) {
 		return drain
 	}
 	return &sLog{formatter: this.formatter, logger: this.logger, scope: err}
 }
 
-func (this *sLog) prints(calldepth int, message string, v []interface{}, err error) error {
+func (this *sLog) prints(calldepth int, message string, v []interface{}, err []error) error {
 	if err == nil {
 		err = this.scope
 	}
@@ -153,32 +153,32 @@ var drain = &sLog{formatter: nil, logger: log.New(ioutil.Discard, "", 0), scope:
 
 type sSelector struct {
 	*sLogger
-	scope error
+	scope []error
 }
 
 func (this *sSelector) Log(pri Priority) Log {
-	return this.logs[pri.Bound()].ScopedLog(this.scope)
+	return this.logs[pri.Bound()].ScopedLog(this.scope...)
 }
 
 func (this *sSelector) Info() Log {
-	return this.logs[PriorityInfo].ScopedLog(this.scope)
+	return this.logs[PriorityInfo].ScopedLog(this.scope...)
 }
 
 func (this *sSelector) Notice() Log {
-	return this.logs[PriorityNotice].ScopedLog(this.scope)
+	return this.logs[PriorityNotice].ScopedLog(this.scope...)
 }
 
 func (this *sSelector) Warning() Log {
-	return this.logs[PriorityWarn].ScopedLog(this.scope)
+	return this.logs[PriorityWarn].ScopedLog(this.scope...)
 }
 
 func (this *sSelector) Error() Log {
-	return this.logs[PriorityError].ScopedLog(this.scope)
+	return this.logs[PriorityError].ScopedLog(this.scope...)
 }
 
 func (this *sSelector) Trace(detail int) Log {
 	if PriorityTrace+Priority(detail-1) <= this.level {
-		return this.logs[PriorityTrace].ScopedLog(this.scope)
+		return this.logs[PriorityTrace].ScopedLog(this.scope...)
 	} else {
 		return drain
 	}
@@ -200,13 +200,13 @@ func (this *sSelector) Logger() *log.Logger {
 }
 
 func (this *sSelector) isSuccess() bool {
-	return this.scope == nil || this.scope == errSuccess || this.scope == errEllipsis
+	return this.scope == nil || len(this.scope) == 1 && (this.scope[0] == nil || this.scope[0] == errSuccess || this.scope[0] == errEllipsis)
 }
 
 func (this *sSelector) scopedLog() Log {
 	if this.isSuccess() {
-		return this.logs[PriorityNotice].ScopedLog(this.scope)
+		return this.logs[PriorityNotice].ScopedLog(this.scope...)
 	} else {
-		return this.logs[PriorityError].ScopedLog(this.scope)
+		return this.logs[PriorityError].ScopedLog(this.scope...)
 	}
 }

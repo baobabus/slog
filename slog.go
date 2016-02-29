@@ -19,9 +19,9 @@ type Logger interface {
 	Accessor
 	Level() Priority
 	Formatter() Formatter
-	On(err error) Selector
+	On(err ...error) Selector
 	Success() Selector
-	With(err error) Selector
+	With(err ...error) Selector
 }
 
 type Log interface {
@@ -29,8 +29,8 @@ type Log interface {
 	Prints(message string, v ...interface{})
 	Fatals(message string, v ...interface{})
 	Logger() *log.Logger
-	ScopedLog(err error) Log
-	prints(calldepth int, message string, v []interface{}, err error) error
+	ScopedLog(err ...error) Log
+	prints(calldepth int, message string, v []interface{}, err []error) error
 	// Shortcuts to log.Logger
 	Output(calldepth int, s string) error
 	Printf(format string, v ...interface{})
@@ -102,14 +102,14 @@ func Trace(detail int) Log {
 	return SharedLogger().Trace(detail)
 }
 
-func On(err error) Selector {
-	return SharedLogger().On(err)
+func On(err ...error) Selector {
+	return SharedLogger().On(err...)
 }
 
 func Success() Selector {
 	return SharedLogger().Success()
 }
 
-func With(err error) Selector {
-	return SharedLogger().With(err)
+func With(err ...error) Selector {
+	return SharedLogger().With(err...)
 }

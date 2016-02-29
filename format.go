@@ -9,9 +9,9 @@ import (
 	"time"
 )
 
-type Formatter func(string, []interface{}, error) string
+type Formatter func(string, []interface{}, []error) string
 
-func SimpleFormatter(message string, v []interface{}, e error) string {
+func SimpleFormatter(message string, v []interface{}, es []error) string {
 	buf := &bytes.Buffer{}
 	sep := ""
 	if len(message) > 0 {
@@ -27,28 +27,34 @@ func SimpleFormatter(message string, v []interface{}, e error) string {
 		}
 		buf.WriteString(asString(v[i]))
 	}
-	if e != nil {
+	if es != nil && len(es) > 0 {
 		if buf.Len() > 0 {
 			buf.WriteString(" - ")
 		}
-		if e == errSuccess || e == errEllipsis {
-			buf.WriteString(e.Error())
-		} else {
-			fmt.Fprintf(buf, "error=%v", e)
+		ml := len(es) > 1
+		for _, e := range es {
+			if ml {
+				buf.WriteString("\n\t")
+			}
+			if e == errSuccess || e == errEllipsis {
+				buf.WriteString(e.Error())
+			} else {
+				fmt.Fprintf(buf, "error=%v", e)
+			}
 		}
 	}
 	return buf.String()
 }
 
-func CompactJsonFormatter(message string, v []interface{}, e error) string {
+func CompactJsonFormatter(message string, v []interface{}, e []error) string {
 	return jsonFormatter(message, v, e, false)
 }
 
-func PrettyJsonFormatter(message string, v []interface{}, e error) string {
+func PrettyJsonFormatter(message string, v []interface{}, e []error) string {
 	return jsonFormatter(message, v, e, true)
 }
 
-func jsonFormatter(message string, v []interface{}, e error, pretty bool) string {
+func jsonFormatter(message string, v []interface{}, e []error, pretty bool) string {
 	m := make(map[string]interface{})
 	for i := 0; i < len(v); i += 2 {
 		k, ok := v[i].(string)
@@ -56,12 +62,8 @@ func jsonFormatter(message string, v []interface{}, e error, pretty bool) string
 			m[k] = v[i+1]
 		}
 	}
-	if e != nil {
-		if e == errSuccess {
-			m["success"] = true
-		} else {
-			m["error"] = e.Error()
-		}
+	if e != nil && len(e) > 0 {
+		m["errors"] = e
 	}
 	var b []byte
 	var err error
