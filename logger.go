@@ -81,6 +81,10 @@ func (this *sLogger) On(err error) Selector {
 	return &sSelector{this, err}
 }
 
+func (this *sLogger) Success() Selector {
+	return &sSelector{this, errSuccess}
+}
+
 func (this *sLogger) With(err error) Selector {
 	if err == nil {
 		err = errSuccess

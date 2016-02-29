@@ -20,6 +20,7 @@ type Logger interface {
 	Level() Priority
 	Formatter() Formatter
 	On(err error) Selector
+	Success() Selector
 	With(err error) Selector
 }
 
@@ -103,6 +104,10 @@ func Trace(detail int) Log {
 
 func On(err error) Selector {
 	return SharedLogger().On(err)
+}
+
+func Success() Selector {
+	return SharedLogger().Success()
 }
 
 func With(err error) Selector {
