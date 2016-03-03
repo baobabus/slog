@@ -4,12 +4,14 @@ package slog
 
 import (
 	"os"
+	"strings"
 	"sync"
 )
 
 var (
 	rtLevel       = "info"
 	rtTrace  uint = 0
+	rtModules     = ""
 	rtFormat      = "simple"
 	rtLog         = "stderr"
 )
@@ -27,7 +29,7 @@ func SharedLogger() Logger {
 	sharedLoggerMu.Lock()
 	defer sharedLoggerMu.Unlock()
 	if sharedLogger == nil {
-		sharedLogger, _ = New(SharedFacility(), DefaultLevel(), DefaultFormatter())
+		sharedLogger, _ = New(SharedFacility(), DefaultLevel(), DefaultFormatter(), DefaultFilter())
 	}
 	return sharedLogger
 }
@@ -68,6 +70,17 @@ func DefaultLevel() Priority {
 	default:
 		return PriorityInfo
 	}
+}
+
+func DefaultFilter() []string {
+	res := make([]string, 0)
+	if len(rtModules) > 0 {
+		res = strings.Split(rtModules, ",")
+		for i, _ := range res {
+			res[i] = strings.TrimSpace(res[i])
+		}
+	}
+	return res
 }
 
 func DefaultFormatter() Formatter {

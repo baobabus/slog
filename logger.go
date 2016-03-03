@@ -8,6 +8,8 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"runtime"
+	"strings"
 )
 
 var (
@@ -23,7 +25,7 @@ type sLogger struct {
 	logs      map[Priority]Log
 }
 
-func New(facility Facility, level Priority, formatter Formatter) (Logger, error) {
+func New(facility Facility, level Priority, formatter Formatter, filter []string) (Logger, error) {
 	if facility == nil {
 		return nil, errNoFacility
 	}
@@ -36,7 +38,11 @@ func New(facility Facility, level Priority, formatter Formatter) (Logger, error)
 	}
 	logs := make(map[Priority]Log, len(ls))
 	for p, l := range ls {
-		logs[p] = &sLog{formatter: formatter, logger: l, scope: nil}
+		if p < PriorityTrace {
+			logs[p] = &sLog{formatter: formatter, logger: l, scope: nil}
+		} else {
+			logs[p] = &sLog{formatter: formatter, logger: l, filter: filter, scope: nil}
+		}
 	}
 	return &sLogger{level: level, formatter: formatter, logs: logs}, err
 }
@@ -95,6 +101,7 @@ func (this *sLogger) With(err ...error) Selector {
 type sLog struct {
 	formatter Formatter
 	logger    *log.Logger
+	filter    []string
 	scope     []error
 	soff      int
 }
@@ -113,18 +120,32 @@ func (this *sLog) Fatals(message string, v ...interface{}) {
 }
 
 func (this *sLog) Logger() *log.Logger {
-	return this.logger
+	return this.filteredLogger(2)
 }
 
 func (this *sLog) ScopedLog(err ...error) Log {
 	if err == nil || len(err) == 0 || (len(err) == 1 && err[0] == nil) {
 		return drain
 	}
-	return &sLog{formatter: this.formatter, logger: this.logger, scope: err}
+	return &sLog{formatter: this.formatter, logger: this.logger, filter: this.filter, scope: err}
 }
 
 func (this *sLog) Offset(stackOffset int) Log {
-	return &sLog{formatter: this.formatter, logger: this.logger, scope: this.scope, soff: this.soff+stackOffset}
+	return &sLog{formatter: this.formatter, logger: this.logger, filter: this.filter, scope: this.scope, soff: this.soff+stackOffset}
+}
+
+func (this *sLog) filteredLogger(calldepth int) *log.Logger {
+	if len(this.filter) == 0 {
+		return this.logger
+	}
+	if _, file, _, ok := runtime.Caller(calldepth+this.soff); ok {
+		for _, f := range this.filter {
+			if strings.HasSuffix(file, f) {
+				return this.logger
+			}
+		}
+	}
+	return dscrd
 }
 
 func (this *sLog) prints(calldepth int, message string, v []interface{}, err []error) error {
@@ -135,26 +156,27 @@ func (this *sLog) prints(calldepth int, message string, v []interface{}, err []e
 	if this.formatter != nil {
 		s = this.formatter(message, v, err)
 	}
-	return this.Logger().Output(calldepth+this.soff+1, s)
+	return this.filteredLogger(calldepth+1).Output(calldepth+this.soff+1, s)
 }
 
 func (this *sLog) Output(calldepth int, s string) error {
-	return this.Logger().Output(calldepth+this.soff+1, s)
+	return this.filteredLogger(calldepth).Output(calldepth+this.soff+1, s)
 }
 
 func (this *sLog) Printf(format string, v ...interface{}) {
-	this.Logger().Output(2, fmt.Sprintf(format, v...))
+	this.filteredLogger(2).Output(2, fmt.Sprintf(format, v...))
 }
 
 func (this *sLog) Print(v ...interface{}) {
-	this.Logger().Output(2, fmt.Sprint(v...))
+	this.filteredLogger(2).Output(2, fmt.Sprint(v...))
 }
 
 func (this *sLog) Println(v ...interface{}) {
-	this.Logger().Output(2, fmt.Sprintln(v...))
+	this.filteredLogger(2).Output(2, fmt.Sprintln(v...))
 }
 
-var drain = &sLog{formatter: nil, logger: log.New(ioutil.Discard, "", 0), scope: nil}
+var dscrd = log.New(ioutil.Discard, "", 0)
+var drain = &sLog{formatter: nil, logger: dscrd, scope: nil}
 
 type sSelector struct {
 	*sLogger
