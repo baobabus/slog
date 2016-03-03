@@ -30,6 +30,7 @@ type Log interface {
 	Fatals(message string, v ...interface{})
 	Logger() *log.Logger
 	ScopedLog(err ...error) Log
+	Offset(stackOffset int) Log
 	prints(calldepth int, message string, v []interface{}, err []error) error
 	// Shortcuts to log.Logger
 	Output(calldepth int, s string) error

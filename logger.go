@@ -96,6 +96,7 @@ type sLog struct {
 	formatter Formatter
 	logger    *log.Logger
 	scope     []error
+	soff      int
 }
 
 func (this *sLog) Printe(message string, v ...interface{}) {
@@ -122,6 +123,10 @@ func (this *sLog) ScopedLog(err ...error) Log {
 	return &sLog{formatter: this.formatter, logger: this.logger, scope: err}
 }
 
+func (this *sLog) Offset(stackOffset int) Log {
+	return &sLog{formatter: this.formatter, logger: this.logger, scope: this.scope, soff: this.soff+stackOffset}
+}
+
 func (this *sLog) prints(calldepth int, message string, v []interface{}, err []error) error {
 	if err == nil {
 		err = this.scope
@@ -130,11 +135,11 @@ func (this *sLog) prints(calldepth int, message string, v []interface{}, err []e
 	if this.formatter != nil {
 		s = this.formatter(message, v, err)
 	}
-	return this.Logger().Output(calldepth+1, s)
+	return this.Logger().Output(calldepth+this.soff+1, s)
 }
 
 func (this *sLog) Output(calldepth int, s string) error {
-	return this.Logger().Output(calldepth+1, s)
+	return this.Logger().Output(calldepth+this.soff+1, s)
 }
 
 func (this *sLog) Printf(format string, v ...interface{}) {
