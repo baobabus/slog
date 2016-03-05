@@ -4,7 +4,7 @@ package slog
 
 import (
 	"errors"
-	"sys/windows"
+	"golang.org/x/sys/windows"
 )
 
 func (this Priority) EventlogPriority() uint16 {
@@ -20,6 +20,7 @@ func (this Priority) EventlogPriority() uint16 {
 	case PriorityTrace:
 		return windows.EVENTLOG_INFORMATION_TYPE
 	}
+	return uint16(this)
 }
 
 // TODO Add implementation

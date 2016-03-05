@@ -1,5 +1,7 @@
 // Copyright 2016 Aleksey Blinov. All rights reserved.
 
+// +build darwin dragonfly freebsd linux nacl netbsd openbsd solaris
+
 package slog
 
 import (
