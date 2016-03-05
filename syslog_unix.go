@@ -41,6 +41,10 @@ func (this *fSyslog) OpenLogs(level Priority) (map[Priority]*log.Logger, error) 
 	return res, nil
 }
 
+func (this *fSyslog) Reopen() error {
+	return nil
+}
+
 type lSyslog struct {
 	writer   *syslog.Writer
 	priority Priority

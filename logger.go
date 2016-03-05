@@ -20,6 +20,7 @@ var (
 )
 
 type sLogger struct {
+	facility  Facility
 	level     Priority
 	formatter Formatter
 	logs      map[Priority]Log
@@ -44,7 +45,7 @@ func New(facility Facility, level Priority, formatter Formatter, filter []string
 			logs[p] = &sLog{formatter: formatter, logger: l, filter: filter, scope: nil}
 		}
 	}
-	return &sLogger{level: level, formatter: formatter, logs: logs}, err
+	return &sLogger{facility: facility, level: level, formatter: formatter, logs: logs}, err
 }
 
 func (this *sLogger) Level() Priority {
@@ -131,14 +132,14 @@ func (this *sLog) ScopedLog(err ...error) Log {
 }
 
 func (this *sLog) Offset(stackOffset int) Log {
-	return &sLog{formatter: this.formatter, logger: this.logger, filter: this.filter, scope: this.scope, soff: this.soff+stackOffset}
+	return &sLog{formatter: this.formatter, logger: this.logger, filter: this.filter, scope: this.scope, soff: this.soff + stackOffset}
 }
 
 func (this *sLog) filteredLogger(calldepth int) *log.Logger {
 	if len(this.filter) == 0 {
 		return this.logger
 	}
-	if _, file, _, ok := runtime.Caller(calldepth+this.soff); ok {
+	if _, file, _, ok := runtime.Caller(calldepth + this.soff); ok {
 		for _, f := range this.filter {
 			if strings.HasSuffix(file, f) {
 				return this.logger
