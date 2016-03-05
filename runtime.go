@@ -9,11 +9,11 @@ import (
 )
 
 var (
-	rtLevel       = "info"
-	rtTrace  uint = 0
-	rtModules     = ""
-	rtFormat      = "simple"
-	rtLog         = "stderr"
+	rtLevel        = "info"
+	rtTrace   uint = 0
+	rtModules      = ""
+	rtFormat       = "simple"
+	rtLog          = "stderr"
 )
 
 var newSyslogFacility func(Priority) (Facility, error)
