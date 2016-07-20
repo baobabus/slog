@@ -32,7 +32,7 @@ func main () {
 	slog.Info().Prints("Starting unconditional", "time", time.Now())
 	for i := 0; i < 4; i++ {
 		err := emit(i)
-		slog.With(err).Warning().Prints("Returned from emit():", "i", i)
+		slog.With(err).Prints("Returned from emit():", "i", i)
 	}
 	slog.Info().Prints("Finished unconditional", "time", time.Now())
 }
@@ -40,14 +40,14 @@ func main () {
 
 Output:
 ```
-INFO 2016/07/20 11:00:53 Starting conditional time=2016-07-20T11:00:53-05:00
-ERROR 2016/07/20 11:00:53 Problem with emit(): i=0 - error=Bad input
-ERROR 2016/07/20 11:00:53 Problem with emit(): i=2 - error=Bad input
-INFO 2016/07/20 11:00:53 Finished conditional time=2016-07-20T11:00:53-05:00
-INFO 2016/07/20 11:00:53 Starting unconditional time=2016-07-20T11:00:53-05:00
-WARNING 2016/07/20 11:00:53 Returned from emit(): i=0 - error=Bad input
-WARNING 2016/07/20 11:00:53 Returned from emit(): i=1 - success
-WARNING 2016/07/20 11:00:53 Returned from emit(): i=2 - error=Bad input
-WARNING 2016/07/20 11:00:53 Returned from emit(): i=3 - success
-INFO 2016/07/20 11:00:53 Finished unconditional time=2016-07-20T11:00:53-05:00
+INFO 2016/07/20 11:23:58 Starting conditional time=2016-07-20T11:23:58-05:00
+ERROR 2016/07/20 11:23:58 Problem with emit(): i=0 - error=Bad input
+ERROR 2016/07/20 11:23:58 Problem with emit(): i=2 - error=Bad input
+INFO 2016/07/20 11:23:58 Finished conditional time=2016-07-20T11:23:58-05:00
+INFO 2016/07/20 11:23:58 Starting unconditional time=2016-07-20T11:23:58-05:00
+ERROR 2016/07/20 11:23:58 Returned from emit(): i=0 - error=Bad input
+NOTICE 2016/07/20 11:23:58 Returned from emit(): i=1 - success
+ERROR 2016/07/20 11:23:58 Returned from emit(): i=2 - error=Bad input
+NOTICE 2016/07/20 11:23:58 Returned from emit(): i=3 - success
+INFO 2016/07/20 11:23:58 Finished unconditional time=2016-07-20T11:23:58-05:00
 ```

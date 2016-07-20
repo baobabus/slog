@@ -23,7 +23,7 @@ func main () {
 	slog.Info().Prints("Starting unconditional", "time", time.Now())
 	for i := 0; i < 4; i++ {
 		err := emit(i)
-		slog.With(err).Warning().Prints("Returned from emit():", "i", i)
+		slog.With(err).Prints("Returned from emit():", "i", i)
 	}
 	slog.Info().Prints("Finished unconditional", "time", time.Now())
 }
